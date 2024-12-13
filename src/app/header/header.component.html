@@ -1,0 +1,38 @@
+<mat-toolbar>
+  <button
+    mat-icon-button
+    class="example-icon"
+    aria-label="icon-button with pets icon"
+    routerLink="/"
+  >
+    <mat-icon>home</mat-icon>
+  </button>
+  <button
+    mat-icon-button
+    class="example-icon"
+    aria-label="icon-button with pets icon"
+    routerLink="/kitties"
+  >
+    <mat-icon>pets</mat-icon>
+  </button>
+  <span class="example-spacer"></span>
+  @if (!(isAuthenticated$ | async)) {
+  <button
+    mat-icon-button
+    (click)="login()"
+    class="example-icon favorite-icon"
+    aria-label="Example icon-button with login icon"
+  >
+    <mat-icon>login</mat-icon>
+  </button>
+  } @else {
+  <button
+    mat-icon-button
+    (click)="logout()"
+    class="example-icon"
+    aria-label="Example icon-button with share icon"
+  >
+    <mat-icon>logout</mat-icon>
+  </button>
+  }
+</mat-toolbar>

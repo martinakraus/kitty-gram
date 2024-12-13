@@ -1,0 +1,18 @@
+<mat-form-field class="search-form-field">
+  <input
+    matInput
+    type="search"
+    placeholder="Search..."
+    #searchControl
+    id="searchQuery"
+    (keyup.enter)="search(searchControl.value)"
+  />
+  <button matSuffix mat-icon-button aria-label="Search">
+    <mat-icon>search</mat-icon>
+  </button>
+</mat-form-field>
+
+@if(searchQuery()) {
+<h3>You searched for:</h3>
+<p [innerHTML]="result()"></p>
+}

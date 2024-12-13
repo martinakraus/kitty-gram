@@ -1,0 +1,13 @@
+.kitty-list-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px; /* Abstand zwischen den Karten */
+  justify-content: space-around;
+  align-items: stretch;
+}
+
+.kitty-card-wrapper {
+//  flex: 1 1 calc(33.333% - 16px); /* Drei Karten pro Zeile, mit Abstand */
+  box-sizing: border-box;
+  //flex: 1 0 auto;
+}
