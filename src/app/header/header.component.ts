@@ -1,12 +1,10 @@
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, DOCUMENT } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
-import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { AuthService } from '@auth0/auth0-angular';
 import { map, Observable, tap } from 'rxjs';
 
 @Component({
@@ -22,20 +20,20 @@ import { map, Observable, tap } from 'rxjs';
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent {
-  private readonly oidcSecurityService = inject(OidcSecurityService);
+  private readonly authService = inject(AuthService);
+  private readonly doc = inject(DOCUMENT);
   isAuthenticated$: Observable<boolean> =
-    this.oidcSecurityService.isAuthenticated$.pipe(
-      map((config) => config.isAuthenticated),
+    this.authService.isAuthenticated$.pipe(
       tap((isAuthenticated) => console.log('isAuthenticated', isAuthenticated))
     );
 
   login() {
-    this.oidcSecurityService.authorize();
+    this.authService.loginWithRedirect();
   }
 
   logout() {
-    this.oidcSecurityService
-      .logoff()
-      .subscribe((result) => console.log(result));
+    this.authService.logout({
+      logoutParams: { returnTo: this.doc.location.origin },
+    });
   }
 }
