@@ -7,4 +7,6 @@ export const authConfig: AuthConfig = {
     redirect_uri: window.location.origin,
     audience: '',
   },
+  cacheLocation: 'localstorage',
+  useRefreshTokens: true,
 };
