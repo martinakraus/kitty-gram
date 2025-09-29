@@ -1,6 +1,6 @@
 <app-search-bar [searchQuery]="query()" />
 <div class="kitty-list-container">
-  @for (kitty of kitties; track kitty) {
+  @for (kitty of kitties | async; track kitty) {
   <app-kitty-card class="kitty-card-wrapper" [kitty]="kitty"></app-kitty-card>
   }
 </div>

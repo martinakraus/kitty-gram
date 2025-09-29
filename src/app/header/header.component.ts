@@ -4,17 +4,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '@auth0/auth0-angular';
-import { map, Observable, tap } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-header',
   imports: [
     MatToolbarModule,
     MatButtonModule,
+    AsyncPipe,
     MatIconModule,
     RouterLink,
-    AsyncPipe,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
@@ -22,18 +21,13 @@ import { map, Observable, tap } from 'rxjs';
 export class HeaderComponent {
   private readonly authService = inject(AuthService);
   private readonly doc = inject(DOCUMENT);
-  isAuthenticated$: Observable<boolean> =
-    this.authService.isAuthenticated$.pipe(
-      tap((isAuthenticated) => console.log('isAuthenticated', isAuthenticated))
-    );
+  isAuthenticated$ = this.authService.isAuthenticated$;
 
-  login() {
-    this.authService.loginWithRedirect();
+  async login() {
+    await this.authService.login();
   }
 
-  logout() {
-    this.authService.logout({
-      logoutParams: { returnTo: this.doc.location.origin },
-    });
+  async logout() {
+    await this.authService.logout();
   }
 }

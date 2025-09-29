@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { AboutComponent } from './about/about.component';
-import { authGuardFn } from '@auth0/auth0-angular';
+import { CallbackComponent } from './auth/callback.component';
 
 export const routes: Routes = [
   {
@@ -13,8 +13,11 @@ export const routes: Routes = [
     component: AboutComponent,
   },
   {
+    path: 'callback',
+    component: CallbackComponent,
+  },
+  {
     path: 'kitties',
-    canActivate: [authGuardFn],
     loadChildren: () =>
       import('./kitty/kitty.routes').then((m) => m.KITTY_ROUTES),
   },

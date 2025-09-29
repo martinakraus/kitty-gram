@@ -1,65 +1,36 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+import { Observable, from } from 'rxjs';
 import { Kitty } from './models/model';
-import { query } from '@angular/animations';
+import { AuthService } from '../services/auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class KittyApiService {
-  kitties: Kitty[] = [
-    { image: 'cat1.jpeg', name: 'Mittens', race: 'Ragdoll' },
-    { image: 'cat2.jpeg', name: 'Mauzi', race: 'Abyssinian' },
-    { image: 'cat9.jpeg', name: 'Nala', race: 'Ragdoll' },
-    { image: 'cat3.jpeg', name: 'Marsi & Meowny', race: 'Europ. Shorthair' },
-    { image: 'cat4.jpeg', name: 'Susi', race: 'Siamese' },
-    { image: 'cat5.jpeg', name: 'Lenny & Morle', race: 'Europ. Shorthair' },
-    { image: 'cat6.jpeg', name: 'Moritz', race: 'Europ. Shorthair' },
-    { image: 'cat7.jpeg', name: 'Whisky', race: 'British Shorthair' },
-    { image: 'cat8.png', name: 'Raupy', race: 'Bengal' },
-    { image: 'cat11.jpeg', name: 'Mimi', race: 'British Shorthair' },
-    { image: 'cat10.jpeg', name: 'Lucy', race: 'Maine Coon' },
-    { image: 'cat2.jpeg', name: 'Mauzi', race: 'Abyssinian' },
-    { image: 'cat9.jpeg', name: 'Nala', race: 'Ragdoll' },
-    { image: 'cat3.jpeg', name: 'Marsi & Meowny', race: 'Europ. Shorthair' },
-    { image: 'cat4.jpeg', name: 'Susi', race: 'Siamese' },
-    { image: 'cat5.jpeg', name: 'Lenny & Morle', race: 'Europ. Shorthair' },
-    { image: 'cat6.jpeg', name: 'Moritz', race: 'Europ. Shorthair' },
-    { image: 'cat7.jpeg', name: 'Whisky', race: 'British Shorthair' },
-    { image: 'cat8.png', name: 'Raupy', race: 'Bengal' },
-    { image: 'cat11.jpeg', name: 'Mimi', race: 'British Shorthair' },
-    { image: 'cat10.jpeg', name: 'Lucy', race: 'Maine Coon' },
-    { image: 'cat1.jpeg', name: 'Mittens', race: 'Ragdoll' },
-    { image: 'cat2.jpeg', name: 'Mauzi', race: 'Abyssinian' },
-    { image: 'cat9.jpeg', name: 'Nala', race: 'Ragdoll' },
-    { image: 'cat3.jpeg', name: 'Marsi & Meowny', race: 'Europ. Shorthair' },
-    { image: 'cat4.jpeg', name: 'Susi', race: 'Siamese' },
-    { image: 'cat5.jpeg', name: 'Lenny & Morle', race: 'Europ. Shorthair' },
-    { image: 'cat6.jpeg', name: 'Moritz', race: 'Europ. Shorthair' },
-    { image: 'cat7.jpeg', name: 'Whisky', race: 'British Shorthair' },
-    { image: 'cat8.png', name: 'Raupy', race: 'Bengal' },
-    { image: 'cat11.jpeg', name: 'Mimi', race: 'British Shorthair' },
-    { image: 'cat10.jpeg', name: 'Lucy', race: 'Maine Coon' },
-    { image: 'cat1.jpeg', name: 'Mittens', race: 'Ragdoll' },
-    { image: 'cat2.jpeg', name: 'Mauzi', race: 'Abyssinian' },
-    { image: 'cat9.jpeg', name: 'Nala', race: 'Ragdoll' },
-    { image: 'cat3.jpeg', name: 'Marsi & Meowny', race: 'Europ. Shorthair' },
-    { image: 'cat4.jpeg', name: 'Susi', race: 'Siamese' },
-    { image: 'cat5.jpeg', name: 'Lenny & Morle', race: 'Europ. Shorthair' },
-    { image: 'cat6.jpeg', name: 'Moritz', race: 'Europ. Shorthair' },
-    { image: 'cat7.jpeg', name: 'Whisky', race: 'British Shorthair' },
-    { image: 'cat8.png', name: 'Raupy', race: 'Bengal' },
-    { image: 'cat11.jpeg', name: 'Mimi', race: 'British Shorthair' },
-    { image: 'cat10.jpeg', name: 'Lucy', race: 'Maine Coon' },
-    { image: 'cat1.jpeg', name: 'Mittens', race: 'Ragdoll' },
-  ];
+  private readonly apiUrl = 'http://localhost:3000/api/kitties';
+  private readonly authService = inject(AuthService);
 
-  getAll(filter?: { query: string }): Kitty[] {
-    if (filter?.query) {
-      return this.kitties.filter((kitty) =>
-        kitty.name.toLowerCase().includes(filter?.query.toLowerCase())
-      );
-    } else {
-      return this.kitties;
+  getAll(filter?: { query: string }): Observable<Kitty[]> {
+    const oidcClient = this.authService.getOidcClient();
+    const accessToken = this.authService.getAccessToken();
+    const url = filter?.query
+      ? `${this.apiUrl}?query=${encodeURIComponent(filter.query)}`
+      : this.apiUrl;
+
+    // If not authenticated, use regular fetch
+    if (!accessToken) {
+      return from(fetch(url).then((response) => response.json()));
     }
+
+    // Use fetchWithTokens for authenticated requests with DPoP
+    const fetchWithDPoP = oidcClient.fetchWithTokens(fetch, true);
+
+    return from(
+      fetchWithDPoP(url, {
+        headers: {
+          Authorization: `DPoP ${accessToken}`,
+        },
+      }).then((response) => response.json())
+    );
   }
 }

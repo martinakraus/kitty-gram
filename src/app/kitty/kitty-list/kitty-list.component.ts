@@ -6,6 +6,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { SearchBarComponent } from '../search-bar/search-bar.component';
+import { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-kitty-list',
@@ -15,6 +17,7 @@ import { SearchBarComponent } from '../search-bar/search-bar.component';
     MatIconModule,
     MatButtonModule,
     SearchBarComponent,
+    AsyncPipe,
   ],
   templateUrl: './kitty-list.component.html',
   styleUrl: './kitty-list.component.scss',
@@ -22,7 +25,7 @@ import { SearchBarComponent } from '../search-bar/search-bar.component';
 export class KittyListComponent implements OnInit {
   kittyApiService = inject(KittyApiService);
   readonly query = input('');
-  kitties: Kitty[] = [];
+  kitties!: Observable<Kitty[]>;
 
   constructor() {
     effect(() => {
