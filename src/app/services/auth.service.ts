@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { OidcClient } from '@axa-fr/oidc-client';
+// Rename auth-dummy.config.ts to auth.config.ts
 import { authConfig } from '../auth/auth.config';
 import { BehaviorSubject } from 'rxjs';
 
